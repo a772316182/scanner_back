@@ -30,6 +30,7 @@
     "@swc/cli": "^0.7.8",
     "@swc/core": "^1.13.4",
     "fast-xml-parser": "^5.2.5",
+    "mongoose": "^8.18.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "xml2js": "^0.6.2"
