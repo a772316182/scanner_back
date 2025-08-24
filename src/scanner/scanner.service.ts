@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { $ } from 'bun';
 import * as fs from 'fs'; // 导入 Node.js 的文件系统模块
-import { NmapScanSpeed } from './scanner.type';
+import { NmapScanSpeed } from '../parser/scanner.type.nmap';
 
 @Injectable()
 export class ScannerService {
@@ -29,33 +29,58 @@ export class ScannerService {
     }
 
     // 检查文件是否可以用sudo无密码直接执行
-    if (process.env.USER !== 'root') {
-      try {
-        $`sudo -n ${this.nmapPath} -V`;
-        $`sudo -n ${this.fscanPath} -h`;
-        this.logger.log('Sudo passwordless execution check passed for nmap and fscan.');
-      } catch (error) {
-        // 如果 execSync 抛出错误，通常意味着 `sudo -n` 执行失败，需要密码。
-        this.logger.error('Sudo passwordless execution check failed:', error.message);
-        throw new Error(
-          `Passwordless sudo is required for nmap and fscan.
+    try {
+      $`sudo -n ${this.nmapPath} -V`;
+      $`sudo -n ${this.fscanPath} -h`;
+      this.logger.log(
+        'Sudo passwordless execution check passed for nmap and fscan.',
+      );
+    } catch (error) {
+      // 如果 execSync 抛出错误，通常意味着 `sudo -n` 执行失败，需要密码。
+      this.logger.error(
+        'Sudo passwordless execution check failed:',
+        error.message,
+      );
+      throw new Error(
+        `Passwordless sudo is required for nmap and fscan.
            Please configure /etc/sudoers in the tail to allow the current user to run these commands without a password.
            Example for nmap: ${process.env.USER} ALL=(ALL) NOPASSWD: ${this.nmapPath}
-           Example for fscan: ${process.env.USER} ALL=(ALL) NOPASSWD: ${this.fscanPath}`
-        );
-      }
+           Example for fscan: ${process.env.USER} ALL=(ALL) NOPASSWD: ${this.fscanPath}`,
+      );
     }
   }
 
   async runFscanScan(target: string, threads: number = 200): Promise<string> {
-    return await $`sudo -n ${this.fscanPath} -h ${target} -nopoc -nobr -f json -t ${threads} -p ${threads}`.text();
+    const logFileName = `./log/fscan_${this.UUID()}.json`;
+    this.logger.log(`executing fscan scan: ${target}, command: sudo -n ${this.fscanPath} -h ${target} -t ${threads} -fingerprint -log ALL -nopoc -nobr -f json -o ${logFileName}`);
+    await $`sudo -n ${this.fscanPath} -h ${target} -t ${threads} -fingerprint -log ALL -nopoc -nobr -f json -o ${logFileName}`.text();
+    return logFileName;
   }
 
   async runNmapScan(
     target: string,
-    threads: number = 200,
-    speed: NmapScanSpeed = NmapScanSpeed.Aggressive
+    timeout: number = 90,
+    ports: number[] = [],
+    speed: NmapScanSpeed = NmapScanSpeed.Aggressive,
   ): Promise<string> {
-    return await $`sudo -n ${this.nmapPath} -sS -p- ${target} --min-parallelism ${threads} -T${speed}`.text();
+    const scanPorts = ports.length > 0 ? ports.join(',') : '1-65535';
+    const logFileName = `./log/nmap_${this.UUID()}.xml`;
+    this.logger.log(`executing nmap scan: ${target}, command: sudo -n ${this.nmapPath} -n ${target} --host-timeout ${timeout}s -O --osscan-guess -sS -p ${scanPorts} -T${speed} -oX ${logFileName}`);
+    await $`sudo -n ${this.nmapPath} -n ${target} --host-timeout ${timeout}s -O --osscan-guess -sS -p ${scanPorts} -T${speed} -oX ${logFileName}`.text();
+    return logFileName;
+  }
+
+  UUID(): string {
+    return `${this.getYYDDMMHHMM()}-${crypto.randomUUID()}`;
+  }
+
+  getYYDDMMHHMM(date = new Date()): string {
+    const year = date.getFullYear().toString().slice(-2);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+    return year + month + day + hours + minutes;
   }
 }

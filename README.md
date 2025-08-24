@@ -25,17 +25,19 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+**This project using Bun rather Node.js as Runtime, please install it.**
+
 ## Project setup
 
 ```bash
-$ npm install
+$ bun install
 ```
 
 ## Compile and run the project
 
 ```bash
 # development
-$ npm run start
+$ bun --watch src/main.ts
 
 # watch mode
 $ npm run start:dev

@@ -1,19 +1,19 @@
-// src/app.module.ts
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ScannerModule } from './scanner/scanner.module';
+import { ParserModule } from './parser/parser.module';
 
 @Module({
   imports: [
-    // 全局加载配置模块
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    ScannerModule,
+    ScannerModule, 
+    ParserModule, 
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
