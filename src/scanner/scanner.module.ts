@@ -5,4 +5,4 @@ import { ScannerService } from './scanner.service';
   providers: [ScannerService],
   exports: [ScannerService],
 })
-export class ScannerModule { }
+export class ScannerModule {}

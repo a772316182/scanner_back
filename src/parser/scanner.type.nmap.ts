@@ -24,29 +24,29 @@ export interface NmapParserOptions {
  * 端口状态信息
  */
 export interface PortState {
-  'attr_state': string;
-  'attr_reason': string;
-  'attr_reason_ttl': number;
+  attr_state: string;
+  attr_reason: string;
+  attr_reason_ttl: number;
 }
 
 /**
  * 服务信息
  */
 export interface Service {
-  'attr_name'?: string;
-  'attr_method'?: string;
-  'attr_conf'?: number;
-  'attr_product'?: string;
-  'attr_version'?: string;
-  'attr_extrainfo'?: string;
+  attr_name?: string;
+  attr_method?: string;
+  attr_conf?: number;
+  attr_product?: string;
+  attr_version?: string;
+  attr_extrainfo?: string;
 }
 
 /**
  * 端口信息
  */
 export interface Port {
-  'attr_protocol': string;
-  'attr_portid': number;
+  attr_protocol: string;
+  attr_portid: number;
   state: PortState;
   service?: Service;
 }
@@ -55,17 +55,17 @@ export interface Port {
  * 地址信息
  */
 export interface Address {
-  'attr_addr': string;
-  'attr_addrtype': 'ipv4' | 'ipv6' | 'mac';
-  'attr_vendor'?: string;
+  attr_addr: string;
+  attr_addrtype: 'ipv4' | 'ipv6' | 'mac';
+  attr_vendor?: string;
 }
 
 /**
  * 主机名信息
  */
 export interface Hostname {
-  'attr_name': string;
-  'attr_type': string;
+  attr_name: string;
+  attr_type: string;
 }
 
 /**
@@ -79,18 +79,18 @@ export interface Hostnames {
  * 额外端口信息
  */
 export interface ExtraReasons {
-  'attr_reason': string;
-  'attr_count': number;
-  'attr_proto'?: string;
-  'attr_ports'?: string;
+  attr_reason: string;
+  attr_count: number;
+  attr_proto?: string;
+  attr_ports?: string;
 }
 
 /**
  * 额外端口状态
  */
 export interface ExtraPorts {
-  'attr_state': string;
-  'attr_count': number;
+  attr_state: string;
+  attr_count: number;
   extrareasons: ExtraReasons[];
 }
 
@@ -113,11 +113,11 @@ export interface Cpe {
  * OS 分类信息
  */
 export interface OsClass {
-  'attr_type': string;
-  'attr_vendor': string;
-  'attr_osfamily': string;
-  'attr_osgen'?: string;
-  'attr_accuracy': number;
+  attr_type: string;
+  attr_vendor: string;
+  attr_osfamily: string;
+  attr_osgen?: string;
+  attr_accuracy: number;
   cpe?: Cpe[];
 }
 
@@ -125,18 +125,18 @@ export interface OsClass {
  * 使用的端口信息
  */
 export interface PortUsed {
-  'attr_state': string;
-  'attr_proto': string;
-  'attr_portid': number;
+  attr_state: string;
+  attr_proto: string;
+  attr_portid: number;
 }
 
 /**
  * OS 匹配信息
  */
 export interface OsMatch {
-  'attr_name': string;
-  'attr_accuracy': number;
-  'attr_line': number;
+  attr_name: string;
+  attr_accuracy: number;
+  attr_line: number;
   osclass: OsClass[];
 }
 
@@ -144,7 +144,7 @@ export interface OsMatch {
  * OS 指纹信息
  */
 export interface OsFingerprint {
-  'attr_fingerprint': string;
+  attr_fingerprint: string;
 }
 
 /**
@@ -160,37 +160,37 @@ export interface Os {
  * 主机状态
  */
 export interface Status {
-  'attr_state': string;
-  'attr_reason': string;
-  'attr_reason_ttl': number;
+  attr_state: string;
+  attr_reason: string;
+  attr_reason_ttl: number;
 }
 
 /**
  * 时间信息
  */
 export interface Times {
-  'attr_srtt': number;
-  'attr_rttvar': number;
-  'attr_to': number;
+  attr_srtt: number;
+  attr_rttvar: number;
+  attr_to: number;
 }
 
 /**
  * 距离信息
  */
 export interface Distance {
-  'attr_value': number;
+  attr_value: number;
 }
 
 /**
  * 主机信息
  */
 export interface Host {
-  'attr_starttime': number;
-  'attr_endtime': number;
-  'attr_timedout'?: boolean; // 添加超时标志
+  attr_starttime: number;
+  attr_endtime: number;
+  attr_timedout?: boolean; // 添加超时标志
   status: Status;
   address: Address[];
-  hostnames: Hostnames; 
+  hostnames: Hostnames;
   ports?: Ports; // 可选，因为超时时可能没有端口信息
   os?: Os; // 可选，因为超时时可能没有OS信息
   distance?: Distance;
@@ -203,51 +203,51 @@ export interface Host {
 export interface HostHint {
   status: Status;
   address: Address[];
-  hostnames: Hostnames; 
+  hostnames: Hostnames;
 }
 
 /**
  * 扫描信息
  */
 export interface ScanInfo {
-  'attr_type': string;
-  'attr_protocol': string;
-  'attr_numservices': number;
-  'attr_services': string;
+  attr_type: string;
+  attr_protocol: string;
+  attr_numservices: number;
+  attr_services: string;
 }
 
 /**
  * 详细程度
  */
 export interface Verbose {
-  'attr_level': number;
+  attr_level: number;
 }
 
 /**
  * 调试级别
  */
 export interface Debugging {
-  'attr_level': number;
+  attr_level: number;
 }
 
 /**
  * 完成信息
  */
 export interface Finished {
-  'attr_time': number;
-  'attr_timestr': string;
-  'attr_summary': string;
-  'attr_elapsed': number;
-  'attr_exit': string;
+  attr_time: number;
+  attr_timestr: string;
+  attr_summary: string;
+  attr_elapsed: number;
+  attr_exit: string;
 }
 
 /**
  * 主机统计
  */
 export interface HostsStats {
-  'attr_up': number;
-  'attr_down': number;
-  'attr_total': number;
+  attr_up: number;
+  attr_down: number;
+  attr_total: number;
 }
 
 /**
@@ -262,12 +262,12 @@ export interface RunStats {
  * Nmap 运行结果主结构
  */
 export interface NmapRun {
-  'attr_scanner': string;
-  'attr_args': string;
-  'attr_start': number;
-  'attr_startstr': string;
-  'attr_version': string;
-  'attr_xmloutputversion': string;
+  attr_scanner: string;
+  attr_args: string;
+  attr_start: number;
+  attr_startstr: string;
+  attr_version: string;
+  attr_xmloutputversion: string;
   scaninfo: ScanInfo;
   verbose: Verbose;
   debugging: Debugging;

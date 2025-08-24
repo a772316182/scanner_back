@@ -28,11 +28,13 @@ export class ScannerService {
     this.logger.debug(`current setting path of fscan: ${this.fscanPath}`);
     this.logger.debug(`current setting path of nmap: ${this.nmapPath}`);
 
-    // 使用同步方式检查 sudo -n 是否可无密码执行，确保 try/catch 能捕获失败
+    // 检查是否允许无密码执行指定命令，避免因被测程序退出码非 0 导致误报
     try {
-      execSync(`sudo -n ${this.nmapPath} -V`, { stdio: 'ignore' });
-      execSync(`sudo -n ${this.fscanPath} -h`, { stdio: 'ignore' });
-      this.logger.log('Sudo passwordless execution check passed for nmap and fscan.');
+      execSync(`sudo -n -l -- ${this.nmapPath}`, { stdio: 'ignore' });
+      execSync(`sudo -n -l -- ${this.fscanPath}`, { stdio: 'ignore' });
+      this.logger.log(
+        'Sudo passwordless execution check passed for nmap and fscan.',
+      );
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Sudo passwordless execution check failed: ${msg}`);
@@ -40,7 +42,7 @@ export class ScannerService {
         `Passwordless sudo is required for nmap and fscan.
         Please configure /etc/sudoers to allow the current user to run these commands without a password.
         Example for nmap: ${process.env.USER} ALL=(ALL) NOPASSWD: ${this.nmapPath}
-        Example for fscan: ${process.env.USER} ALL=(ALL) NOPASSWD: ${this.fscanPath}`
+        Example for fscan: ${process.env.USER} ALL=(ALL) NOPASSWD: ${this.fscanPath}`,
       );
     }
   }

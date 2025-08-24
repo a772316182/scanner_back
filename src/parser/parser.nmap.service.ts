@@ -79,7 +79,9 @@ export class ParserNmapService {
   /**
    * 返回原始 + 简化的结果
    */
-  async parseNmapLogfileWithSummary(filePath: string): Promise<NmapParseResult | null> {
+  async parseNmapLogfileWithSummary(
+    filePath: string,
+  ): Promise<NmapParseResult | null> {
     const nmapRun = await this.parseNmapLogfile(filePath);
     if (!nmapRun) return null;
 
@@ -112,20 +114,37 @@ export class ParserNmapService {
    * 构建简化摘要
    */
   private buildSummary(nmapRun: NmapRun): SimplifiedNmapResult {
-    const hostsArr = Array.isArray(nmapRun.host) ? nmapRun.host : nmapRun.host ? [nmapRun.host] : [];
+    const hostsArr = Array.isArray(nmapRun.host)
+      ? nmapRun.host
+      : nmapRun.host
+        ? [nmapRun.host]
+        : [];
 
     const hostSummaries: SimplifiedHost[] = hostsArr.map((h) => {
-      const addrs = Array.isArray(h.address) ? h.address : h.address ? [h.address] : [];
-      const ipv4 = addrs.find((a) => a?.['attr_addrtype'] === 'ipv4')?.['attr_addr'] || null;
-      const mac = addrs.find((a) => a?.['attr_addrtype'] === 'mac')?.['attr_addr'] || null;
-      const vendor = addrs.find((a) => a?.['attr_addrtype'] === 'mac')?.['attr_vendor'] || null;
+      const addrs = Array.isArray(h.address)
+        ? h.address
+        : h.address
+          ? [h.address]
+          : [];
+      const ipv4 =
+        addrs.find((a) => a?.['attr_addrtype'] === 'ipv4')?.['attr_addr'] ||
+        null;
+      const mac =
+        addrs.find((a) => a?.['attr_addrtype'] === 'mac')?.['attr_addr'] ||
+        null;
+      const vendor =
+        addrs.find((a) => a?.['attr_addrtype'] === 'mac')?.['attr_vendor'] ||
+        null;
 
       const portNodes = h?.ports?.port || [];
       const openPorts: SimplifiedPort[] = portNodes
         .filter((p) => p?.state?.['attr_state'] === 'open')
         .map((p) => ({
           protocol: p?.['attr_protocol'] ?? 'tcp',
-          port: typeof p?.['attr_portid'] === 'number' ? p['attr_portid'] : Number(p?.['attr_portid']) || 0,
+          port:
+            typeof p?.['attr_portid'] === 'number'
+              ? p['attr_portid']
+              : Number(p?.['attr_portid']) || 0,
           service: p?.service?.['attr_name'] ?? null,
           reason: p?.state?.['attr_reason'] ?? null,
           reason_ttl: p?.state?.['attr_reason_ttl'] ?? null,
@@ -135,13 +154,17 @@ export class ParserNmapService {
         .map((m) => ({
           name: m?.['attr_name'] ?? null,
           accuracy:
-            typeof m?.['attr_accuracy'] === 'number' ? m['attr_accuracy'] : Number(m?.['attr_accuracy']) || 0,
+            typeof m?.['attr_accuracy'] === 'number'
+              ? m['attr_accuracy']
+              : Number(m?.['attr_accuracy']) || 0,
           classes: (m?.osclass || []).map((c) => ({
             type: c?.['attr_type'] ?? null,
             vendor: c?.['attr_vendor'] ?? null,
             family: c?.['attr_osfamily'] ?? null,
             gen: c?.['attr_osgen'] ?? null,
-            cpe: (c?.cpe || []).map((cpe) => cpe?.['#text'] || '').filter(Boolean),
+            cpe: (c?.cpe || [])
+              .map((cpe) => cpe?.['#text'] || '')
+              .filter(Boolean),
           })),
         }))
         .sort((a, b) => (b.accuracy || 0) - (a.accuracy || 0));

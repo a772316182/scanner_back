@@ -3,7 +3,7 @@ import { ParserFscanService } from './parser.fscan.service';
 import { ParserNmapService } from './parser.nmap.service';
 
 @Module({
-    providers: [ParserFscanService, ParserNmapService],
-    exports: [ParserFscanService, ParserNmapService],
+  providers: [ParserFscanService, ParserNmapService],
+  exports: [ParserFscanService, ParserNmapService],
 })
-export class ParserModule { }
+export class ParserModule {}

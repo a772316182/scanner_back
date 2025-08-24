@@ -12,8 +12,8 @@ export class AppController {
   constructor(
     private readonly scannerService: ScannerService,
     private readonly parserFscanService: ParserFscanService,
-    private readonly parserNmapService: ParserNmapService
-  ) { }
+    private readonly parserNmapService: ParserNmapService,
+  ) {}
 
   @Get('/fscan')
   async fscan(@Query('target') target: string): Promise<FscanLogEntry[]> {
@@ -26,7 +26,8 @@ export class AppController {
   async nmap(@Query('target') target: string): Promise<NmapRun | string> {
     this.logger.log(`Nmap scan requested for target: ${target}`);
     const resultFilePath = await this.scannerService.runNmapScan(target);
-    const nmapResult = await this.parserNmapService.parseNmapLogfile(resultFilePath);
+    const nmapResult =
+      await this.parserNmapService.parseNmapLogfile(resultFilePath);
     return nmapResult ? nmapResult : 'No data';
   }
 }
