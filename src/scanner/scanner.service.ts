@@ -1,8 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
+// @ts-ignore
 import { $ } from 'bun';
 import * as fs from 'fs';
 import { execSync } from 'child_process';
 import { NmapScanSpeed } from '../parser/scanner.type.nmap';
+import { ScannerTaskExecuteResult } from './scanner.type';
 
 @Injectable()
 export class ScannerService {
@@ -47,41 +49,57 @@ export class ScannerService {
     }
   }
 
-  async runFscanScan(target: string, threads: number = 200): Promise<string> {
-    const logFileName = `./log/fscan_${this.UUID()}.json`;
+  async runDIYCommand(
+    command: string,
+    UUID: string,
+  ): Promise<ScannerTaskExecuteResult> {
+    const logFileName = `./log/diy_${UUID}.log`;
+    this.logger.log(
+      `executing diy command: ${command}, log file: ${logFileName}`,
+    );
+    await $`sudo -n bash -c ${command} > ${logFileName} 2>&1`.text();
+    return {
+      taskId: UUID,
+      logFilePath: logFileName,
+      command: command,
+    };
+  }
+
+  async runFscanScan(
+    target: string,
+    UUID: string,
+    threads: number = 200,
+  ): Promise<ScannerTaskExecuteResult> {
+    const logFileName = `./log/fscan_${UUID}.json`;
     this.logger.log(
       `executing fscan scan: ${target}, command: sudo -n ${this.fscanPath} -h ${target} -t ${threads} -fingerprint -log ALL -nopoc -nobr -f json -o ${logFileName}`,
     );
     await $`sudo -n ${this.fscanPath} -h ${target} -t ${threads} -fingerprint -log ALL -nopoc -nobr -f json -o ${logFileName}`.text();
-    return logFileName;
+    return {
+      taskId: UUID,
+      logFilePath: logFileName,
+      command: `sudo -n ${this.fscanPath} -h ${target} -t ${threads} -fingerprint -log ALL -nopoc -nobr -f json -o ${logFileName}`,
+    };
   }
 
   async runNmapScan(
     target: string,
+    UUID: string,
     timeout: number = 90,
     ports: number[] = [],
     speed: NmapScanSpeed = NmapScanSpeed.Aggressive,
-  ): Promise<string> {
+  ): Promise<ScannerTaskExecuteResult> {
     const scanPorts = ports.length > 0 ? ports.join(',') : '1-65535';
-    const logFileName = `./log/nmap_${this.UUID()}.xml`;
+    const logFileName = `./log/nmap_${UUID}.xml`;
     this.logger.log(
       `executing nmap scan: ${target}, command: sudo -n ${this.nmapPath} -n ${target} --host-timeout ${timeout}s -O --osscan-guess -sS -p ${scanPorts} -T${speed} -oX ${logFileName}`,
     );
     await $`sudo -n ${this.nmapPath} -n ${target} --host-timeout ${timeout}s -O --osscan-guess -sS -p ${scanPorts} -T${speed} -oX ${logFileName}`.text();
-    return logFileName;
-  }
 
-  private UUID(): string {
-    return `${this.getYYDDMMHHMM()}-${crypto.randomUUID()}`;
-  }
-
-  private getYYDDMMHHMM(date = new Date()): string {
-    const year = date.getFullYear().toString().slice(-2);
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-
-    return year + month + day + hours + minutes;
+    return {
+      taskId: UUID,
+      logFilePath: logFileName,
+      command: `sudo -n ${this.nmapPath} -n ${target} --host-timeout ${timeout}s -O --osscan-guess -sS -p ${scanPorts} -T${speed} -oX ${logFileName}`,
+    };
   }
 }

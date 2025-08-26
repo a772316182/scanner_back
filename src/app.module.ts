@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { ScannerModule } from './scanner/scanner.module';
 import { ParserModule } from './parser/parser.module';
 import { DaoModule } from './dao/dao.module';
+import { TaskService } from './task/task.service';
 
 @Module({
   imports: [
@@ -16,6 +17,6 @@ import { DaoModule } from './dao/dao.module';
     DaoModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, TaskService],
 })
 export class AppModule {}

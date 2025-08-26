@@ -3,5 +3,6 @@ import { DaoService } from './dao.service';
 
 @Module({
   providers: [DaoService],
+  exports: [DaoService],
 })
 export class DaoModule {}
