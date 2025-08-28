@@ -1,0 +1,109 @@
+mcp_version: '2.0'
+name: ScannerAgent
+description: 一个能够执行 fscan、nmap 和自定义扫描命令的代理。它能处理异步任务，自动轮询任务状态并在完成后获取结果。
+
+tools:
+  - http_tool:
+      name: run_fscan_scan
+      description: "执行 fscan 扫描。这是一个异步任务，代理将自动轮询结果。"
+      method: GET
+      # 假设你的服务运行在本地 3000 端口
+      url: 'http://localhost:3000/scanner/fscan'
+      query_parameters:
+        - name: target
+          description: "要扫描的目标，可以是 IP 地址或域名，例如 '192.168.2.1' 或 'example.com'。"
+          type: string
+          required: true
+
+      # 告诉 Agent 如何从初始响应中提取任务 ID
+      response_to_task_id_mapping:
+        task_id_json_path: 'taskId'
+
+      # 配置轮询逻辑
+      polling:
+        url: 'http://localhost:3000/scanner/getTaskStatus'
+        method: GET
+        query_parameters:
+          - name: taskId
+            value: '{task_id}' # {task_id} 是一个占位符，将被替换为上面获取到的任务 ID
+        # 当 status 字段为 'COMPLETED' 时，认为任务成功
+        success_conditions:
+          - 'status == "COMPLETED"'
+        # 当 status 字段为 'FAILED' 或 'NOT_FOUND' 时，认为任务失败
+        failure_conditions:
+          - 'status == "FAILED"'
+          - 'status == "NOT_FOUND"'
+
+      # 配置任务成功后如何获取最终结果
+      result:
+        url: 'http://localhost:3000/scanner/getTaskResults'
+        method: GET
+        query_parameters:
+          - name: taskId
+            value: '{task_id}'
+
+  - http_tool:
+      name: run_nmap_scan
+      description: "执行 Nmap 扫描。这是一个异步任务，代理将自动轮询结果。"
+      method: GET
+      url: 'http://localhost:3000/scanner/nmap'
+      query_parameters:
+        - name: target
+          description: "要扫描的目标 IP 地址或域名。"
+          type: string
+          required: true
+
+      response_to_task_id_mapping:
+        task_id_json_path: 'taskId'
+
+      polling:
+        url: 'http://localhost:3000/scanner/getTaskStatus'
+        method: GET
+        query_parameters:
+          - name: taskId
+            value: '{task_id}'
+        success_conditions:
+          - 'status == "COMPLETED"'
+        failure_conditions:
+          - 'status == "FAILED"'
+          - 'status == "NOT_FOUND"'
+
+      result:
+        url: 'http://localhost:3000/scanner/getTaskResults'
+        method: GET
+        query_parameters:
+          - name: taskId
+            value: '{task_id}'
+
+  - http_tool:
+      name: run_diy_command
+      description: "执行用户自定义的扫描命令。这是一个异步任务，代理将自动轮询结果。"
+      method: GET
+      url: 'http://localhost:3000/scanner/diy'
+      query_parameters:
+        - name: command
+          description: "要执行的完整 shell 命令。"
+          type: string
+          required: true
+
+      response_to_task_id_mapping:
+        task_id_json_path: 'taskId'
+
+      polling:
+        url: 'http://localhost:3000/scanner/getTaskStatus'
+        method: GET
+        query_parameters:
+          - name: taskId
+            value: '{task_id}'
+        success_conditions:
+          - 'status == "COMPLETED"'
+        failure_conditions:
+          - 'status == "FAILED"'
+          - 'status == "NOT_FOUND"'
+
+      result:
+        url: 'http://localhost:3000/scanner/getTaskResults'
+        method: GET
+        query_parameters:
+          - name: taskId
+            value: '{task_id}'
