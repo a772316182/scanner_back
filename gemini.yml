@@ -1,4 +1,4 @@
-mcp_version: '2.0'
+mcp_version: '1.0'
 name: ScannerAgent
 description: 一个能够执行 fscan、nmap 和自定义扫描命令的代理。它能处理异步任务，自动轮询任务状态并在完成后获取结果。
 
