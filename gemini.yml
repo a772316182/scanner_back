@@ -7,8 +7,8 @@ tools:
       name: run_fscan_scan
       description: "执行 fscan 扫描。这是一个异步任务，代理将自动轮询结果。"
       method: GET
-      # 假设你的服务运行在本地 3000 端口
-      url: 'http://localhost:3000/scanner/fscan'
+      # 假设你的服务运行在本地 9000 端口
+      url: 'http://localhost:9000/scanner/fscan'
       query_parameters:
         - name: target
           description: "要扫描的目标 ，可以是 IP 地址或域名，例如 '192.168.2.1' 或 'example.com'。"
@@ -21,7 +21,7 @@ tools:
 
       # 配置轮询逻辑
       polling:
-        url: 'http://localhost:3000/scanner/getTaskStatus'
+        url: 'http://localhost:9000/scanner/getTaskStatus'
         method: GET
         query_parameters:
           - name: taskId
@@ -36,7 +36,7 @@ tools:
 
       # 配置任务成功后如何获取最终结果
       result:
-        url: 'http://localhost:3000/scanner/getTaskResults'
+        url: 'http://localhost:9000/scanner/getTaskResults'
         method: GET
         query_parameters:
           - name: taskId
@@ -46,7 +46,7 @@ tools:
       name: run_nmap_scan
       description: "执行 Nmap 扫描。这是一个异步任务，代理将自动轮询结果。"
       method: GET
-      url: 'http://localhost:3000/scanner/nmap'
+      url: 'http://localhost:9000/scanner/nmap'
       query_parameters:
         - name: target
           description: "要扫描的目标 IP 地址或域名。"
@@ -57,7 +57,7 @@ tools:
         task_id_json_path: 'taskId'
 
       polling:
-        url: 'http://localhost:3000/scanner/getTaskStatus'
+        url: 'http://localhost:9000/scanner/getTaskStatus'
         method: GET
         query_parameters:
           - name: taskId
@@ -69,7 +69,7 @@ tools:
           - 'status == "NOT_FOUND"'
 
       result:
-        url: 'http://localhost:3000/scanner/getTaskResults'
+        url: 'http://localhost:9000/scanner/getTaskResults'
         method: GET
         query_parameters:
           - name: taskId
@@ -79,7 +79,7 @@ tools:
       name: run_diy_command
       description: "执行用户自定义的扫描命令。这是一个异步任务，代理将自动轮询结果。"
       method: GET
-      url: 'http://localhost:3000/scanner/diy'
+      url: 'http://localhost:9000/scanner/diy'
       query_parameters:
         - name: command
           description: "要执行的完整 shell 命令。"
@@ -90,7 +90,7 @@ tools:
         task_id_json_path: 'taskId'
 
       polling:
-        url: 'http://localhost:3000/scanner/getTaskStatus'
+        url: 'http://localhost:9000/scanner/getTaskStatus'
         method: GET
         query_parameters:
           - name: taskId
@@ -102,7 +102,7 @@ tools:
           - 'status == "NOT_FOUND"'
 
       result:
-        url: 'http://localhost:3000/scanner/getTaskResults'
+        url: 'http://localhost:9000/scanner/getTaskResults'
         method: GET
         query_parameters:
           - name: taskId
