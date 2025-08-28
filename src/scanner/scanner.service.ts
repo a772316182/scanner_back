@@ -1,6 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
 import { $ } from 'bun';
 import * as fs from 'fs';
 import { execSync } from 'child_process';
