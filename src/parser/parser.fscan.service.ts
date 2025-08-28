@@ -1,13 +1,20 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { FscanLogEntry } from 'src/parser/scanner.type.fscan';
+import { readFile } from 'fs/promises';
 
 @Injectable()
 export class ParserFscanService {
   private readonly logger = new Logger(ParserFscanService.name);
 
-  parseFscanLogfile(filePath: string): FscanLogEntry[] {
+  async parseFscanLogfile(filePath: string): Promise<FscanLogEntry[]> {
     this.logger.debug(`Parsing input: ${filePath}`);
-    const fileContent = require('fs').readFileSync(filePath, 'utf-8');
+    let fileContent: string;
+    try {
+      fileContent = await readFile(filePath, 'utf-8');
+    } catch (readError) {
+      this.logger.error(`读取文件失败: ${filePath}`, readError);
+      return [];
+    }
 
     const trimmedContent = fileContent.trim();
     if (trimmedContent === '') {
@@ -19,10 +26,10 @@ export class ParserFscanService {
     try {
       const parsedData = JSON.parse(jsonArrayString) as FscanLogEntry[];
       return parsedData;
-    } catch (error) {
+    } catch (parseError) {
       this.logger.error('解析JSON流失败。请检查文件格式是否正确。');
       this.logger.error('处理后的字符串:', jsonArrayString);
-      this.logger.error('错误详情:', error);
+      this.logger.error('错误详情:', parseError);
       return [];
     }
   }
